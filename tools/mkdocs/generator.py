@@ -482,6 +482,114 @@ def create_statistics(cluster_dict):
     return statistic_output
 
 
+def create_ThreatActor_stats(cluster_dict, reduced=True):
+    data = {"name": "Threat Actor Stats", "children": []}
+    count = 0
+
+    threat_actor_clusters = []
+    for cluster in cluster_dict.values():
+        if cluster.galaxie.name == "Threat Actor":
+            threat_actor_clusters.append(cluster)
+
+    tools = []
+    for cluster in cluster_dict.values():
+        if cluster.galaxie.name == "MITRE ATLAS Attack Pattern":
+            tools.append(cluster)
+        if cluster.galaxie.name == "MITRE ATLAS Course of Action":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Attack Pattern":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Course of Action":
+            tools.append(cluster)
+        if cluster.galaxie.name == "mitre-data-component":
+            tools.append(cluster)
+        if cluster.galaxie.name == "mitre-data-source":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Enterprise Attack - Attack Pattern":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Enterprise Attack - Course of Action":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Enterprise Attack - Intrusion Set":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Enterprise Attack - Malware":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Enterprise Attack - Tool":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Assets":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Groups":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Levels":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Software":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Tactics":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Techniques":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Intrusion Set":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Malware":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Mobile Attack - Attack Pattern":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Mobile Attack - Course of Action":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Mobile Attack - Intrusion Set":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Mobile Attack - Malware":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Mobile Attack - Tool":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Pre-Attack - Attack Pattern":
+            tools.append(cluster)
+        if cluster.galaxie.name == "Pre-Attack - Intrusion Set":
+            tools.append(cluster)
+        if cluster.galaxie.name == "mitre-tool":
+            tools.append(cluster)
+
+    # print(tools)
+
+    # Get all the relations for the threat actor clusters and only keep tools
+    for cluster in threat_actor_clusters:
+        # cluster.related_list where dest-uuid is in tools
+        relations = []
+        if cluster.related_list is not None and len(cluster.related_list) > 0:
+            if cluster.related_list[0]["dest-uuid"] in [tool.uuid for tool in tools]:
+                related_tool = cluster_dict[cluster.related_list[0]["dest-uuid"]]
+                # print(related_tool.value)
+                relations.append(related_tool.value)
+        if reduced and len(relations) == 0:
+            continue
+        data["children"].append({"id": cluster.value, "relations": relations})
+        count += 1
+
+    for cluster in tools:
+        if reduced and not any(
+            cluster.value in child_relations
+            for child in data["children"]
+            for child_relations in child["relations"]
+        ):
+            continue
+        data["children"].append({"id": cluster.value, "relations": []})
+        count += 1
+
+    print(data)
+
+    with open(
+        os.path.join(f"{SITE_PATH}/01_attachements/data", "threatActor-tools.json"), "w"
+    ) as f:
+        f.write(json.dumps(data, indent=4))
+
+    print(f"Finished creating ThreatActor-Tools json file with {count} clusters")
+
+    # Create page + div
+    with open(os.path.join(SITE_PATH, "auto.md"), "w") as f:
+        f.write(f"# Auto generated page\n\n")
+        f.write(f"<div id='threatActor-tools'></div>\n")
+        f.write(f"</div>\n")
+
+
 def main():
     start_time = time.time()
     galaxies_fnames = []
@@ -524,6 +632,8 @@ def main():
 
     with open(os.path.join(SITE_PATH, "statistics.md"), "w") as index:
         index.write(statistic_output)
+
+    create_ThreatActor_stats(cluster_dict)
 
     print(f"Finished file creation in {time.time() - start_time} seconds")
 

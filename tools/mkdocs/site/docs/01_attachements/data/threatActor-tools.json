@@ -1,0 +1,483 @@
+{
+    "name": "ThreatActor - Tools",
+    "children": [
+        {
+            "id": "Dust Storm",
+            "relations": [
+                "Dust Storm - G0031"
+            ]
+        },
+        {
+            "id": "APT2",
+            "relations": [
+                "Putter Panda - G0024"
+            ]
+        },
+        {
+            "id": "APT3",
+            "relations": [
+                "APT3 - G0022"
+            ]
+        },
+        {
+            "id": "APT18",
+            "relations": [
+                "APT18 - G0026"
+            ]
+        },
+        {
+            "id": "APT19",
+            "relations": [
+                "Deep Panda - G0009"
+            ]
+        },
+        {
+            "id": "Naikon",
+            "relations": [
+                "Naikon - G0019"
+            ]
+        },
+        {
+            "id": "LOTUS PANDA",
+            "relations": [
+                "Lotus Blossom - G0030"
+            ]
+        },
+        {
+            "id": "APT27",
+            "relations": [
+                "Threat Group-3390 - G0027"
+            ]
+        },
+        {
+            "id": "APT10",
+            "relations": [
+                "menuPass - G0045"
+            ]
+        },
+        {
+            "id": "APT24",
+            "relations": [
+                "PittyTiger - G0011"
+            ]
+        },
+        {
+            "id": "Beijing Group",
+            "relations": [
+                "Elderwood - G0066"
+            ]
+        },
+        {
+            "id": "SAMURAI PANDA",
+            "relations": [
+                "APT18 - G0026"
+            ]
+        },
+        {
+            "id": "TEMPER PANDA",
+            "relations": [
+                "admin@338 - G0018"
+            ]
+        },
+        {
+            "id": "Charming Kitten",
+            "relations": [
+                "Charming Kitten - G0058"
+            ]
+        },
+        {
+            "id": "APT33",
+            "relations": [
+                "APT33 - G0064"
+            ]
+        },
+        {
+            "id": "APT29",
+            "relations": [
+                "APT29 - G0016"
+            ]
+        },
+        {
+            "id": "Turla",
+            "relations": [
+                "Turla - G0010"
+            ]
+        },
+        {
+            "id": "ENERGETIC BEAR",
+            "relations": [
+                "Dragonfly - G0035"
+            ]
+        },
+        {
+            "id": "Sandworm",
+            "relations": [
+                "Sandworm Team - G0034"
+            ]
+        },
+        {
+            "id": "FIN7",
+            "relations": [
+                "FIN7 - G0046"
+            ]
+        },
+        {
+            "id": "Lazarus Group",
+            "relations": [
+                "Lazarus Group - G0032"
+            ]
+        },
+        {
+            "id": "Stealth Falcon",
+            "relations": [
+                "Stealth Falcon - G0038"
+            ]
+        },
+        {
+            "id": "QUILTED TIGER",
+            "relations": [
+                "Patchwork - G0040"
+            ]
+        },
+        {
+            "id": "Scarlet Mimic",
+            "relations": [
+                "Scarlet Mimic - G0029"
+            ]
+        },
+        {
+            "id": "Poseidon Group",
+            "relations": [
+                "Poseidon Group - G0033"
+            ]
+        },
+        {
+            "id": "DragonOK",
+            "relations": [
+                "Moafee - G0002"
+            ]
+        },
+        {
+            "id": "ProjectSauron",
+            "relations": [
+                "Strider - G0041"
+            ]
+        },
+        {
+            "id": "GCMAN",
+            "relations": [
+                "GCMAN - G0036"
+            ]
+        },
+        {
+            "id": "APT22",
+            "relations": [
+                "Suckfly - G0039"
+            ]
+        },
+        {
+            "id": "FIN6",
+            "relations": [
+                "FIN6 - G0037"
+            ]
+        },
+        {
+            "id": "Molerats",
+            "relations": [
+                "Molerats - G0021"
+            ]
+        },
+        {
+            "id": "PROMETHIUM",
+            "relations": [
+                "PROMETHIUM - G0056"
+            ]
+        },
+        {
+            "id": "NEODYMIUM",
+            "relations": [
+                "NEODYMIUM - G0055"
+            ]
+        },
+        {
+            "id": "Gamaredon Group",
+            "relations": [
+                "Gamaredon Group - G0047"
+            ]
+        },
+        {
+            "id": "APT32",
+            "relations": [
+                "APT32 - G0050"
+            ]
+        },
+        {
+            "id": "PLATINUM",
+            "relations": [
+                "PLATINUM - G0068"
+            ]
+        },
+        {
+            "id": "FIN8",
+            "relations": [
+                "FIN8 - G0061"
+            ]
+        },
+        {
+            "id": "TA459",
+            "relations": [
+                "TA459 - G0062"
+            ]
+        },
+        {
+            "id": "Tick",
+            "relations": [
+                "BRONZE BUTLER - G0060"
+            ]
+        },
+        {
+            "id": "APT26",
+            "relations": [
+                "Turla - G0010"
+            ]
+        },
+        {
+            "id": "CopyKittens",
+            "relations": [
+                "CopyKittens - G0052"
+            ]
+        },
+        {
+            "id": "Sowbug",
+            "relations": [
+                "Sowbug - G0054"
+            ]
+        },
+        {
+            "id": "MuddyWater",
+            "relations": [
+                "MuddyWater - G0069"
+            ]
+        },
+        {
+            "id": "APT37",
+            "relations": [
+                "APT37 - G0067"
+            ]
+        },
+        {
+            "id": "APT40",
+            "relations": [
+                "Leviathan - G0065"
+            ]
+        },
+        {
+            "id": "APT35",
+            "relations": [
+                "Magic Hound - G0059"
+            ]
+        },
+        {
+            "id": "ALLANITE",
+            "relations": [
+                "ALLANITE"
+            ]
+        },
+        {
+            "id": "Poseidon Group - G0033",
+            "relations": []
+        },
+        {
+            "id": "PittyTiger - G0011",
+            "relations": []
+        },
+        {
+            "id": "admin@338 - G0018",
+            "relations": []
+        },
+        {
+            "id": "Sowbug - G0054",
+            "relations": []
+        },
+        {
+            "id": "PLATINUM - G0068",
+            "relations": []
+        },
+        {
+            "id": "Deep Panda - G0009",
+            "relations": []
+        },
+        {
+            "id": "Molerats - G0021",
+            "relations": []
+        },
+        {
+            "id": "Strider - G0041",
+            "relations": []
+        },
+        {
+            "id": "Sandworm Team - G0034",
+            "relations": []
+        },
+        {
+            "id": "FIN6 - G0037",
+            "relations": []
+        },
+        {
+            "id": "Dust Storm - G0031",
+            "relations": []
+        },
+        {
+            "id": "TA459 - G0062",
+            "relations": []
+        },
+        {
+            "id": "APT37 - G0067",
+            "relations": []
+        },
+        {
+            "id": "NEODYMIUM - G0055",
+            "relations": []
+        },
+        {
+            "id": "Moafee - G0002",
+            "relations": []
+        },
+        {
+            "id": "Threat Group-3390 - G0027",
+            "relations": []
+        },
+        {
+            "id": "Charming Kitten - G0058",
+            "relations": []
+        },
+        {
+            "id": "Naikon - G0019",
+            "relations": []
+        },
+        {
+            "id": "APT32 - G0050",
+            "relations": []
+        },
+        {
+            "id": "MuddyWater - G0069",
+            "relations": []
+        },
+        {
+            "id": "Patchwork - G0040",
+            "relations": []
+        },
+        {
+            "id": "FIN7 - G0046",
+            "relations": []
+        },
+        {
+            "id": "APT3 - G0022",
+            "relations": []
+        },
+        {
+            "id": "GCMAN - G0036",
+            "relations": []
+        },
+        {
+            "id": "Lazarus Group - G0032",
+            "relations": []
+        },
+        {
+            "id": "Lotus Blossom - G0030",
+            "relations": []
+        },
+        {
+            "id": "Dragonfly - G0035",
+            "relations": []
+        },
+        {
+            "id": "Suckfly - G0039",
+            "relations": []
+        },
+        {
+            "id": "Stealth Falcon - G0038",
+            "relations": []
+        },
+        {
+            "id": "BRONZE BUTLER - G0060",
+            "relations": []
+        },
+        {
+            "id": "Scarlet Mimic - G0029",
+            "relations": []
+        },
+        {
+            "id": "Turla - G0010",
+            "relations": []
+        },
+        {
+            "id": "Elderwood - G0066",
+            "relations": []
+        },
+        {
+            "id": "APT29 - G0016",
+            "relations": []
+        },
+        {
+            "id": "menuPass - G0045",
+            "relations": []
+        },
+        {
+            "id": "Putter Panda - G0024",
+            "relations": []
+        },
+        {
+            "id": "Magic Hound - G0059",
+            "relations": []
+        },
+        {
+            "id": "FIN8 - G0061",
+            "relations": []
+        },
+        {
+            "id": "PROMETHIUM - G0056",
+            "relations": []
+        },
+        {
+            "id": "APT33 - G0064",
+            "relations": []
+        },
+        {
+            "id": "APT18 - G0026",
+            "relations": []
+        },
+        {
+            "id": "Leviathan - G0065",
+            "relations": []
+        },
+        {
+            "id": "CopyKittens - G0052",
+            "relations": []
+        },
+        {
+            "id": "Gamaredon Group - G0047",
+            "relations": []
+        },
+        {
+            "id": "ALLANITE",
+            "relations": []
+        },
+        {
+            "id": "APT33",
+            "relations": []
+        },
+        {
+            "id": "Dragonfly",
+            "relations": []
+        },
+        {
+            "id": "Sandworm",
+            "relations": []
+        },
+        {
+            "id": "Charming Kitten - G0058",
+            "relations": []
+        }
+    ]
+}
