@@ -11,7 +11,21 @@ import validators
 CLUSTER_PATH = "../../clusters"
 SITE_PATH = "./site/docs"
 
-FILES_TO_IGNORE = []  # if you want to skip a specific cluster in the generation
+# FILES_TO_IGNORE = ["mitre-enterprise-attack-intrusion-set.json"]  # if you want to skip a specific cluster in the generation
+FILES_TO_IGNORE = [
+                    "mitre-enterprise-attack-attack-pattern.json", 
+                    "mitre-enterprise-attack-course-of-action.json",
+                    "mitre-enterprise-attack-intrusion-set.json",
+                    "mitre-enterprise-attack-malware.json",
+                    "mitre-mobile-attack-attack-pattern.json",
+                    "mitre-mobile-attack-course-of-action.json",
+                    "mitre-mobile-attack-intrusion-set.json",
+                    "mitre-mobile-attack-malware.json",
+                    "mitre-pre-attack-attack-pattern.json",
+                    "mitre-pre-attack-intrusion-set.json",
+                    "mitre-enterprise-attack-tool.json",
+                    "mitre-mobile-attack-tool.json",
+                    ]  # if you want to skip a specific cluster in the generation
 
 # Variables for statistics
 public_relations_count = 0
@@ -60,9 +74,7 @@ We encourage collaboration and contributions to the [MISP Galaxy JSON files](htt
 
 
 class Galaxy:
-    def __init__(
-        self, cluster_list: List[dict], authors, description, name, json_file_name
-    ):
+    def __init__(self, cluster_list: List[dict], authors, description, name, json_file_name):
         self.cluster_list = cluster_list
         self.authors = authors
         self.description = description
@@ -141,6 +153,7 @@ class Cluster:
         self.meta = meta
         self.entry = ""
         self.galaxie = galaxie
+        self.related_clusters = []
 
         global public_clusters_dict
         if self.galaxie:
@@ -296,7 +309,7 @@ class Cluster:
         related_clusters = [
             cluster for cluster in related_clusters if cluster not in to_remove
         ]
-
+        self.related_clusters = related_clusters
         return related_clusters
 
     def _create_related_entry(self):
@@ -483,7 +496,8 @@ def create_statistics(cluster_dict):
 
 
 def create_ThreatActor_stats(cluster_dict, reduced=True):
-    data = {"name": "Threat Actor Stats", "children": []}
+    # data = {"name": "Threat Actor Stats", "children": []}
+    data = []
     count = 0
 
     threat_actor_clusters = []
@@ -493,60 +507,28 @@ def create_ThreatActor_stats(cluster_dict, reduced=True):
 
     tools = []
     for cluster in cluster_dict.values():
-        if cluster.galaxie.name == "MITRE ATLAS Attack Pattern":
-            tools.append(cluster)
-        if cluster.galaxie.name == "MITRE ATLAS Course of Action":
-            tools.append(cluster)
         if cluster.galaxie.name == "Attack Pattern":
             tools.append(cluster)
-        if cluster.galaxie.name == "Course of Action":
-            tools.append(cluster)
-        if cluster.galaxie.name == "mitre-data-component":
-            tools.append(cluster)
-        if cluster.galaxie.name == "mitre-data-source":
-            tools.append(cluster)
-        if cluster.galaxie.name == "Enterprise Attack - Attack Pattern":
-            tools.append(cluster)
-        if cluster.galaxie.name == "Enterprise Attack - Course of Action":
-            tools.append(cluster)
-        if cluster.galaxie.name == "Enterprise Attack - Intrusion Set":
-            tools.append(cluster)
-        if cluster.galaxie.name == "Enterprise Attack - Malware":
-            tools.append(cluster)
-        if cluster.galaxie.name == "Enterprise Attack - Tool":
-            tools.append(cluster)
-        if cluster.galaxie.name == "Assets":
-            tools.append(cluster)
-        if cluster.galaxie.name == "Groups":
-            tools.append(cluster)
-        if cluster.galaxie.name == "Levels":
-            tools.append(cluster)
-        if cluster.galaxie.name == "Software":
-            tools.append(cluster)
-        if cluster.galaxie.name == "Tactics":
-            tools.append(cluster)
-        if cluster.galaxie.name == "Techniques":
-            tools.append(cluster)
-        if cluster.galaxie.name == "Intrusion Set":
-            tools.append(cluster)
-        if cluster.galaxie.name == "Malware":
-            tools.append(cluster)
-        if cluster.galaxie.name == "Mobile Attack - Attack Pattern":
-            tools.append(cluster)
-        if cluster.galaxie.name == "Mobile Attack - Course of Action":
-            tools.append(cluster)
-        if cluster.galaxie.name == "Mobile Attack - Intrusion Set":
-            tools.append(cluster)
-        if cluster.galaxie.name == "Mobile Attack - Malware":
-            tools.append(cluster)
-        if cluster.galaxie.name == "Mobile Attack - Tool":
-            tools.append(cluster)
-        if cluster.galaxie.name == "Pre-Attack - Attack Pattern":
-            tools.append(cluster)
-        if cluster.galaxie.name == "Pre-Attack - Intrusion Set":
-            tools.append(cluster)
-        if cluster.galaxie.name == "mitre-tool":
-            tools.append(cluster)
+        # if cluster.galaxie.name == "Course of Action":
+        #     tools.append(cluster)
+        # if cluster.galaxie.name == "Assets":
+        #     tools.append(cluster)
+        # if cluster.galaxie.name == "Groups":
+        #     tools.append(cluster)
+        # if cluster.galaxie.name == "Levels":
+        #     tools.append(cluster)
+        # if cluster.galaxie.name == "Software":
+        #     tools.append(cluster)
+        # if cluster.galaxie.name == "Tactics":
+        #     tools.append(cluster)
+        # if cluster.galaxie.name == "Techniques":
+        #     tools.append(cluster)
+        # if cluster.galaxie.name == "Intrusion Set":
+        #     tools.append(cluster)
+        # if cluster.galaxie.name == "Malware":
+        #     tools.append(cluster)
+        # if cluster.galaxie.name == "mitre-tool":
+        #     tools.append(cluster)
 
     # print(tools)
 
@@ -555,26 +537,26 @@ def create_ThreatActor_stats(cluster_dict, reduced=True):
         # cluster.related_list where dest-uuid is in tools
         relations = []
         if cluster.related_list is not None and len(cluster.related_list) > 0:
-            if cluster.related_list[0]["dest-uuid"] in [tool.uuid for tool in tools]:
-                related_tool = cluster_dict[cluster.related_list[0]["dest-uuid"]]
-                # print(related_tool.value)
-                relations.append(related_tool.value)
+            # if cluster.related_list[0]["dest-uuid"] in [tool.uuid for tool in tools]:
+            for related_cluster in cluster.related_clusters:
+                if related_cluster[1].uuid in [tool.uuid for tool in tools]:
+                    relations.append(f"circos.{related_cluster[1].galaxie.name}.{related_cluster[1].value}")
         if reduced and len(relations) == 0:
             continue
-        data["children"].append({"id": cluster.value, "relations": relations})
+        data.append({"name": f"circos.{cluster.galaxie.name}.{cluster.value}", "relations": relations})
         count += 1
 
     for cluster in tools:
         if reduced and not any(
             cluster.value in child_relations
-            for child in data["children"]
+            for child in data
             for child_relations in child["relations"]
         ):
             continue
-        data["children"].append({"id": cluster.value, "relations": []})
+        data.append({"name": f"circos.{cluster.galaxie.name}.{cluster.value}", "relations": []})
         count += 1
 
-    print(data)
+    # print(data)
 
     with open(
         os.path.join(f"{SITE_PATH}/01_attachements/data", "threatActor-tools.json"), "w"
@@ -586,7 +568,7 @@ def create_ThreatActor_stats(cluster_dict, reduced=True):
     # Create page + div
     with open(os.path.join(SITE_PATH, "auto.md"), "w") as f:
         f.write(f"# Auto generated page\n\n")
-        f.write(f"<div id='threatActor-tools'></div>\n")
+        f.write(f"<div class='threatActor-tools'>\n")
         f.write(f"</div>\n")
 
 
@@ -621,7 +603,7 @@ def main():
     if not os.path.exists(SITE_PATH):
         os.mkdir(SITE_PATH)
 
-    for galaxy in galaxies:
+    for galaxy in galaxies[:7]:
         galaxy.write_entry(SITE_PATH, cluster_dict)
 
     index_output = create_index(galaxies)
