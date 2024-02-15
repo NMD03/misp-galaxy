@@ -96,53 +96,34 @@ def get_relation_diff(galaxies, old_galaxies, new_galaxies, galaxy_dict, cluster
                                         else:
                                             f.write(f"Related Cluster: Private Cluster")
                                         f.write("\n")
-                                        f.write("///////////////////////////////")
-                                        f.write("\n")
-                                        f.write("Is Relation to old galaxy?")
-                                        if relation['dest-uuid'] in cluster_dict:
-                                            if cluster_dict[relation['dest-uuid']].galaxie.name in old_galaxies:
-                                                f.write(" Yes")
-                                                f.write("\n")
-                                                f.write(f"Is Cluster '{cluster_dict[relation['dest-uuid']].value}' in new galaxy?")
-                                                if cluster_dict[relation['dest-uuid']].uuid in not_found_cluster.keys():
-                                                    f.write(" No")
-                                                    f.write("\n")
-                                                else:
-                                                    f.write(" Yes --> relation from new galaxy cluster to new galaxy cluster should be created")
-                                                    f.write("\n")
-                                            else:
-                                                f.write(" No --> Why is this relation not in new galaxy?")
-                                                f.write("\n")
                                         f.write("--------------------------------------------------------")
                                         f.write("\n")
     return relation_diff
 
 def enrich_new_galaxies(galaxy_map, cluster_dict, not_found_cluster):
     new_galaxie_json = {}
-    for old_galaxie, new_galaxie in galaxy_map.items():
-        with open(os.path.join(CLUSTER_PATH, f"{new_galaxie.json_file_name}.json")) as fr:
-            new_galaxie_json[new_galaxie] = json.load(fr)
-        for cluster in old_galaxie.clusters:
+    for old_galaxy, new_galaxy in galaxy_map.items():
+        with open(os.path.join(CLUSTER_PATH, f"{new_galaxy.json_file_name}.json")) as fr:
+            new_galaxie_json[new_galaxy] = json.load(fr)
+        for cluster in old_galaxy.clusters:
             if cluster.uuid in not_found_cluster: # Cluster not found in new galaxy
                 continue
-            if cluster.uuid in cluster_dict and cluster.related_list is not None: # Cluster is public and has relations
+            if cluster.uuid in cluster_dict and cluster.related_list is not None: # Cluster is exists in new galaxy and has relations
                 for relation in cluster.related_list:
-                    if relation not in [relation for relation in [cluster.related_list for cluster in new_galaxie.clusters]]:
-                        for entry in new_galaxie_json[new_galaxie]["values"]:
+                    if relation["dest-uuid"] in not_found_cluster: # Related cluster not found in new galaxy
+                        continue
+                    if relation not in [relation for relation in [cluster.related_list for cluster in new_galaxy.clusters]]:
+                        for entry in new_galaxie_json[new_galaxy]["values"]:
                             if entry["uuid"] == cluster.uuid:
                                 entry["related"].append(relation)
                                 break
-        with open(os.path.join(CLUSTER_PATH, f"{new_galaxie.json_file_name}.json"), "w") as fw:
-            json.dump(new_galaxie_json[new_galaxie], fw, indent=2)
-        # print(f"Enriched {new_galaxie.json_file_name}.json")
-        # print(f"Added relations to clusters in new galaxy {new_galaxie.json_file_name} from old galaxy {old_galaxie.json_file_name}")
-        # print("--------------------------------------------------------")
-
+        with open(os.path.join(CLUSTER_PATH, f"{new_galaxy.json_file_name}.json"), "w") as fw:
+            json.dump(new_galaxie_json[new_galaxy], fw, indent=2)
 
 def map_galaxies(galaxies, galaxy_dict):
     galaxy_map = {}
-    for old_galaxie, new_galaxie in galaxies.items():
-        galaxy_map[galaxy_dict[old_galaxie]] = galaxy_dict[new_galaxie]
+    for old_galaxy, new_galaxy in galaxies.items():
+        galaxy_map[galaxy_dict[old_galaxy]] = galaxy_dict[new_galaxy]
 
     return galaxy_map
 
@@ -216,5 +197,6 @@ if __name__ == "__main__":
     if ENRICH_NEW_GALAXIES:
         galaxy_map = map_galaxies(new_galaxies, galaxy_dict)
         enrich_new_galaxies(galaxy_map, cluster_dict, not_found_cluster)
+        print("Enriched new galaxies with missing relations")
 
     print(f"Finished evaluation in {time.time() - start_time} seconds")
