@@ -10,22 +10,9 @@ import validators
 
 CLUSTER_PATH = "../../clusters"
 SITE_PATH = "./site/docs"
+GALAXY_PATH = "../../galaxies"
 
-# FILES_TO_IGNORE = ["mitre-enterprise-attack-intrusion-set.json"]  # if you want to skip a specific cluster in the generation
-FILES_TO_IGNORE = [
-                    "mitre-enterprise-attack-attack-pattern.json", 
-                    "mitre-enterprise-attack-course-of-action.json",
-                    "mitre-enterprise-attack-intrusion-set.json",
-                    "mitre-enterprise-attack-malware.json",
-                    "mitre-mobile-attack-attack-pattern.json",
-                    "mitre-mobile-attack-course-of-action.json",
-                    "mitre-mobile-attack-intrusion-set.json",
-                    "mitre-mobile-attack-malware.json",
-                    "mitre-pre-attack-attack-pattern.json",
-                    "mitre-pre-attack-intrusion-set.json",
-                    "mitre-enterprise-attack-tool.json",
-                    "mitre-mobile-attack-tool.json",
-                    ]  # if you want to skip a specific cluster in the generation
+FILES_TO_IGNORE = []  # if you want to skip a specific cluster in the generation
 
 # Variables for statistics
 public_relations_count = 0
@@ -571,9 +558,21 @@ def create_ThreatActor_stats(cluster_dict, reduced=True):
         f.write(f"<div class='threatActor-tools'>\n")
         f.write(f"</div>\n")
 
+def get_deprecated_galaxy_files():
+    deprecated_galaxy_files = []
+    for f in os.listdir(GALAXY_PATH):
+        with open(os.path.join(GALAXY_PATH, f)) as fr:
+            galaxy_json = json.load(fr)
+            if "namespace" in galaxy_json and galaxy_json["namespace"] == "deprecated":
+                deprecated_galaxy_files.append(f)
+
+    return deprecated_galaxy_files
+
 
 def main():
     start_time = time.time()
+
+    FILES_TO_IGNORE.extend(get_deprecated_galaxy_files())
     galaxies_fnames = []
     for f in os.listdir(CLUSTER_PATH):
         if ".json" in f and f not in FILES_TO_IGNORE:
