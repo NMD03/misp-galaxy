@@ -6,6 +6,145 @@ import time
 CLUSTER_PATH = "../../clusters"
 SITE_PATH = "./site/docs"
 FILES_TO_IGNORE = []
+WRITE_FILES = True
+ENRICH_NEW_GALAXIES = True
+
+def get_lost_clusters(galaxies, old_galaxies, new_galaxies, galaxy_dict):
+    not_found_cluster = {}
+    for galaxy in galaxies:
+        if galaxy.name in old_galaxies:
+            for cluster in galaxy.clusters:
+                if cluster.uuid not in [cluster.uuid for cluster in galaxy_dict[new_galaxies[galaxy.name]].clusters]:
+                    not_found_cluster[cluster.uuid] = cluster.galaxie.name
+                    if WRITE_FILES:
+                        with open("notFound.txt", "a") as f:
+                            f.write(f"Cluster: {cluster.value}")
+                            f.write("\n")
+                            f.write(f"UUID: {cluster.uuid}")
+                            f.write("\n")
+                            f.write(f"Old Galaxy: {cluster.galaxie.name}")
+                            f.write("\n")
+                            f.write(f"UUID not found in new Galaxie: {new_galaxies[galaxy.name]}")
+                            f.write("\n")
+                            f.write("///////////////////////////////")
+                            f.write("\n")
+                            f.write("Looking for cluster name in new galaxy")
+                            f.write("\n")
+                            found = False
+                            for new_cluster in galaxy_dict[new_galaxies[galaxy.name]].clusters:
+                                if cluster.value == new_cluster.value:
+                                    f.write(f"Cluster found in new galaxy: {new_galaxies[galaxy.name]}")
+                                    f.write("\n")
+                                    f.write(f"UUID: {new_cluster.uuid}")
+                                    f.write("\n")
+                                    f.write("###############")
+                                    f.write("\n")
+                                    f.write("Compare clusters")
+                                    f.write("\n")
+                                    if cluster.description != new_cluster.description:
+                                        f.write(f"Description not equal: {cluster.description} != {new_cluster.description}")
+                                        f.write("\n")
+                                    if cluster.related_list != new_cluster.related_list:
+                                        f.write(f"Related list not equal: {cluster.related_list} != {new_cluster.related_list}")
+                                        f.write("\n")
+                                    if cluster.meta != new_cluster.meta:
+                                        f.write(f"Meta not equal: {cluster.meta} != {new_cluster.meta}")
+                                        f.write("\n")
+                                    if cluster.date != new_cluster.date:
+                                        f.write(f"Date not equal: {cluster.date} != {new_cluster.date}")
+                                        f.write("\n")
+                                    found = True
+                            if not found:
+                                f.write("Cluster not found in new galaxy")
+                                f.write("\n")
+                            f.write("--------------------------------------------------------")
+                            f.write("\n")
+    return not_found_cluster
+
+def get_relation_diff(galaxies, old_galaxies, new_galaxies, galaxy_dict, cluster_dict):
+    relation_diff = {}
+    for galaxy in galaxies:
+        if galaxy.name in old_galaxies:
+            for cluster in galaxy.clusters:
+                if cluster.uuid in [cluster.uuid for cluster in galaxy_dict[new_galaxies[galaxy.name]].clusters]:
+                    old_relations = []
+                    new_relations = []
+                    if cluster.related_list is not None:
+                        old_relations = [relation for relation in cluster.related_list]
+                    for new_cluster in galaxy_dict[new_galaxies[galaxy.name]].clusters:
+                        if new_cluster.uuid == cluster.uuid:
+                            if new_cluster.related_list is not None:
+                                new_relations = [relation for relation in new_cluster.related_list]
+                    if old_relations != new_relations:
+                        for relation in old_relations:
+                            if relation not in new_relations:
+                                relation_diff[str(relation)] = cluster.uuid
+                                if WRITE_FILES:
+                                    with open("relations.txt", "a") as f:
+                                        f.write(f"Cluster: {cluster.value}")
+                                        f.write("\n")
+                                        f.write(f"UUID: {cluster.uuid}")
+                                        f.write("\n")
+                                        f.write(f"Old Galaxy: {cluster.galaxie.name}")
+                                        f.write("\n")
+                                        f.write(f"Relation not found in new Galaxie: {new_galaxies[galaxy.name]}")
+                                        f.write("\n")
+                                        f.write(f"Relation: {relation}")
+                                        f.write("\n")
+                                        if relation["dest-uuid"] in cluster_dict:
+                                            f.write(f"Related Cluster: {cluster_dict[relation['dest-uuid']].value}, Galaxy: {cluster_dict[relation['dest-uuid']].galaxie.name}")
+                                        else:
+                                            f.write(f"Related Cluster: Private Cluster")
+                                        f.write("\n")
+                                        f.write("///////////////////////////////")
+                                        f.write("\n")
+                                        f.write("Is Relation to old galaxy?")
+                                        if relation['dest-uuid'] in cluster_dict:
+                                            if cluster_dict[relation['dest-uuid']].galaxie.name in old_galaxies:
+                                                f.write(" Yes")
+                                                f.write("\n")
+                                                f.write(f"Is Cluster '{cluster_dict[relation['dest-uuid']].value}' in new galaxy?")
+                                                if cluster_dict[relation['dest-uuid']].uuid in not_found_cluster.keys():
+                                                    f.write(" No")
+                                                    f.write("\n")
+                                                else:
+                                                    f.write(" Yes --> relation from new galaxy cluster to new galaxy cluster should be created")
+                                                    f.write("\n")
+                                            else:
+                                                f.write(" No --> Why is this relation not in new galaxy?")
+                                                f.write("\n")
+                                        f.write("--------------------------------------------------------")
+                                        f.write("\n")
+    return relation_diff
+
+def enrich_new_galaxies(galaxy_map, cluster_dict, not_found_cluster):
+    new_galaxie_json = {}
+    for old_galaxie, new_galaxie in galaxy_map.items():
+        with open(os.path.join(CLUSTER_PATH, f"{new_galaxie.json_file_name}.json")) as fr:
+            new_galaxie_json[new_galaxie] = json.load(fr)
+        for cluster in old_galaxie.clusters:
+            if cluster.uuid in not_found_cluster: # Cluster not found in new galaxy
+                continue
+            if cluster.uuid in cluster_dict and cluster.related_list is not None: # Cluster is public and has relations
+                for relation in cluster.related_list:
+                    if relation not in [relation for relation in [cluster.related_list for cluster in new_galaxie.clusters]]:
+                        for entry in new_galaxie_json[new_galaxie]["values"]:
+                            if entry["uuid"] == cluster.uuid:
+                                entry["related"].append(relation)
+                                break
+        with open(os.path.join(CLUSTER_PATH, f"{new_galaxie.json_file_name}.json"), "w") as fw:
+            json.dump(new_galaxie_json[new_galaxie], fw, indent=2)
+        # print(f"Enriched {new_galaxie.json_file_name}.json")
+        # print(f"Added relations to clusters in new galaxy {new_galaxie.json_file_name} from old galaxy {old_galaxie.json_file_name}")
+        # print("--------------------------------------------------------")
+
+
+def map_galaxies(galaxies, galaxy_dict):
+    galaxy_map = {}
+    for old_galaxie, new_galaxie in galaxies.items():
+        galaxy_map[galaxy_dict[old_galaxie]] = galaxy_dict[new_galaxie]
+
+    return galaxy_map
 
 
 if __name__ == "__main__":
@@ -68,107 +207,14 @@ if __name__ == "__main__":
                     }
     
 
-    not_found_cluster = {}
-    relation_diff = {}
-    for galaxy in galaxies:
-        if galaxy.name in old_galaxies:
-            for cluster in galaxy.clusters:
-                 
-                if cluster.uuid not in [cluster.uuid for cluster in galaxy_dict[new_galaxies[galaxy.name]].clusters]:
-                    with open("notFound.txt", "a") as f:
-                        f.write(f"Cluster: {cluster.value}")
-                        f.write("\n")
-                        f.write(f"UUID: {cluster.uuid}")
-                        f.write("\n")
-                        f.write(f"Old Galaxy: {cluster.galaxie.name}")
-                        f.write("\n")
-                        f.write(f"UUID not found in new Galaxie: {new_galaxies[galaxy.name]}")
-                        f.write("\n")
-                        f.write("///////////////////////////////")
-                        f.write("\n")
-                        f.write("Looking for cluster name in new galaxy")
-                        f.write("\n")
-                        not_found_cluster[cluster.uuid] = cluster.galaxie.name
-                        found = False
-                        for new_cluster in galaxy_dict[new_galaxies[galaxy.name]].clusters:
-                            if cluster.value == new_cluster.value:
-                                f.write(f"Cluster found in new galaxy: {new_galaxies[galaxy.name]}")
-                                f.write("\n")
-                                f.write(f"UUID: {new_cluster.uuid}")
-                                f.write("\n")
-                                f.write("###############")
-                                f.write("\n")
-                                f.write("Compare clusters")
-                                f.write("\n")
-                                if cluster.description != new_cluster.description:
-                                    f.write(f"Description not equal: {cluster.description} != {new_cluster.description}")
-                                    f.write("\n")
-                                if cluster.related_list != new_cluster.related_list:
-                                    f.write(f"Related list not equal: {cluster.related_list} != {new_cluster.related_list}")
-                                    f.write("\n")
-                                if cluster.meta != new_cluster.meta:
-                                    f.write(f"Meta not equal: {cluster.meta} != {new_cluster.meta}")
-                                    f.write("\n")
-                                if cluster.date != new_cluster.date:
-                                    f.write(f"Date not equal: {cluster.date} != {new_cluster.date}")
-                                    f.write("\n")
-                                found = True
-                        if not found:
-                            f.write("Cluster not found in new galaxy")
-                            f.write("\n")
-                        f.write("--------------------------------------------------------")
-                        f.write("\n")
-                else:
-                    old_relations = []
-                    new_relations = []
-                    if cluster.related_list is not None:
-                        old_relations = [relation for relation in cluster.related_list]
-                    for new_cluster in galaxy_dict[new_galaxies[galaxy.name]].clusters:
-                        if new_cluster.uuid == cluster.uuid:
-                            if new_cluster.related_list is not None:
-                                new_relations = [relation for relation in new_cluster.related_list]
-                    if old_relations != new_relations:
-                        for relation in old_relations:
-                            if relation not in new_relations:
-                                with open("relations.txt", "a") as f:
-                                    relation_diff[str(relation)] = cluster.uuid
-                                    f.write(f"Cluster: {cluster.value}")
-                                    f.write("\n")
-                                    f.write(f"UUID: {cluster.uuid}")
-                                    f.write("\n")
-                                    f.write(f"Old Galaxy: {cluster.galaxie.name}")
-                                    f.write("\n")
-                                    f.write(f"Relation not found in new Galaxie: {new_galaxies[galaxy.name]}")
-                                    f.write("\n")
-                                    f.write(f"Relation: {relation}")
-                                    f.write("\n")
-                                    if relation["dest-uuid"] in cluster_dict:
-                                        f.write(f"Related Cluster: {cluster_dict[relation['dest-uuid']].value}, Galaxy: {cluster_dict[relation['dest-uuid']].galaxie.name}")
-                                    else:
-                                        f.write(f"Related Cluster: Private Cluster")
-                                    f.write("\n")
-                                    f.write("///////////////////////////////")
-                                    f.write("\n")
-                                    f.write("Is Relation to old galaxy?")
-                                    if relation['dest-uuid'] in cluster_dict:
-                                        if cluster_dict[relation['dest-uuid']].galaxie.name in old_galaxies:
-                                            f.write(" Yes")
-                                            f.write("\n")
-                                            f.write(f"Is Cluster '{cluster_dict[relation['dest-uuid']].value}' in new galaxy?")
-                                            if cluster_dict[relation['dest-uuid']].uuid in not_found_cluster.keys():
-                                                f.write(" No")
-                                                f.write("\n")
-                                            else:
-                                                f.write(" Yes --> relation from new galaxy cluster to new galaxy cluster should be created")
-                                                f.write("\n")
-
-                                        else:
-                                            f.write(" No --> Why is this relation not in new galaxy?")
-                                            f.write("\n")
-                                    f.write("--------------------------------------------------------")
-                                    f.write("\n")
-
-    print(f"Finished evaluation in {time.time() - start_time} seconds")
+    not_found_cluster = get_lost_clusters(galaxies, old_galaxies, new_galaxies, galaxy_dict)
+    relation_diff = get_relation_diff(galaxies, old_galaxies, new_galaxies, galaxy_dict, cluster_dict)
     print(f"{len(not_found_cluster)} clusters not found in new galaxies")
     print(f"{len(relation_diff)} relations not found in new galaxies")
     print("Check notFound.txt and relations.txt for more information")
+
+    if ENRICH_NEW_GALAXIES:
+        galaxy_map = map_galaxies(new_galaxies, galaxy_dict)
+        enrich_new_galaxies(galaxy_map, cluster_dict, not_found_cluster)
+
+    print(f"Finished evaluation in {time.time() - start_time} seconds")
