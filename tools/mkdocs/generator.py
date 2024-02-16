@@ -483,7 +483,6 @@ def create_statistics(cluster_dict):
 
 
 def create_ThreatActor_stats(cluster_dict, reduced=True):
-    # data = {"name": "Threat Actor Stats", "children": []}
     data = []
     count = 0
 
@@ -517,20 +516,16 @@ def create_ThreatActor_stats(cluster_dict, reduced=True):
         # if cluster.galaxie.name == "mitre-tool":
         #     tools.append(cluster)
 
-    # print(tools)
-
     # Get all the relations for the threat actor clusters and only keep tools
     for cluster in threat_actor_clusters:
-        # cluster.related_list where dest-uuid is in tools
         relations = []
         if cluster.related_list is not None and len(cluster.related_list) > 0:
-            # if cluster.related_list[0]["dest-uuid"] in [tool.uuid for tool in tools]:
             for related_cluster in cluster.related_clusters:
                 if related_cluster[1].uuid in [tool.uuid for tool in tools]:
-                    relations.append(f"circos.{related_cluster[1].galaxie.name}.{related_cluster[1].value}")
+                    relations.append(f"circos;{related_cluster[1].galaxie.name};{related_cluster[1].value}")
         if reduced and len(relations) == 0:
             continue
-        data.append({"name": f"circos.{cluster.galaxie.name}.{cluster.value}", "relations": relations})
+        data.append({"name": f"circos;{cluster.galaxie.name};{cluster.value}", "relations": relations})
         count += 1
 
     for cluster in tools:
@@ -540,13 +535,11 @@ def create_ThreatActor_stats(cluster_dict, reduced=True):
             for child_relations in child["relations"]
         ):
             continue
-        data.append({"name": f"circos.{cluster.galaxie.name}.{cluster.value}", "relations": []})
+        data.append({"name": f"circos;{cluster.galaxie.name};{cluster.value}", "relations": []})
         count += 1
 
-    # print(data)
-
     with open(
-        os.path.join(f"{SITE_PATH}/01_attachements/data", "threatActor-tools.json"), "w"
+        os.path.join(f"{SITE_PATH}/01_attachments/data", "threatActor-tools.json"), "w"
     ) as f:
         f.write(json.dumps(data, indent=4))
 

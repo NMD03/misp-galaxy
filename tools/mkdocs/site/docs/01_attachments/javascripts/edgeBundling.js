@@ -2,7 +2,7 @@ document$.subscribe(function () {
 
     document.querySelectorAll("div.threatActor-tools").forEach(function (element) {
         // fetch("../01_attachements/data/test.json")
-        fetch("../01_attachements/data/threatActor-tools.json")
+        fetch("../01_attachments/data/threatActor-tools.json")
             .then(response => response.json())
             .then(data => {
                 // Create the chart and append it to the element
@@ -134,7 +134,7 @@ document$.subscribe(function () {
     }
 
     function id(node) {
-        return `${node.parent ? id(node.parent) + "." : ""}${node.data.name}`;
+        return `${node.parent ? id(node.parent) + ";" : ""}${node.data.name}`;
     }
 
     function bilink(root) {
@@ -145,7 +145,7 @@ document$.subscribe(function () {
         return root;
     }
 
-    function hierarchy(data, delimiter = ".") {
+    function hierarchy(data, delimiter = ";") {
         let root;
         const map = new Map;
         data.forEach(function find(data) {

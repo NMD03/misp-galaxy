@@ -263,7 +263,7 @@ document$.subscribe(function () {
         var graphHeader = table.querySelector("th.graph");
         if (graphHeader) {
             var tf = new TableFilter(table, {
-                base_path: "../../../../01_attachements/modules/tablefilter/",
+                base_path: "../../../../01_attachments/modules/tablefilter/",
                 highlight_keywords: true,
                 col_2: "checklist",
                 col_widths: ["350px", "350px", "100px"],
