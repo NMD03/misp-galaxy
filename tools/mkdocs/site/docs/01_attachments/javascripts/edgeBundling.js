@@ -1,8 +1,8 @@
 document$.subscribe(function () {
 
-    document.querySelectorAll("div.threatActor-tools").forEach(function (element) {
+    document.querySelectorAll("div.tidal").forEach(function (element) {
         // fetch("../01_attachements/data/test.json")
-        fetch("../01_attachments/data/threatActor-tools.json")
+        fetch("../01_attachments/data/tidal.json")
             .then(response => response.json())
             .then(data => {
                 // Create the chart and append it to the element
